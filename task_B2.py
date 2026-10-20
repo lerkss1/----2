@@ -1,47 +1,71 @@
-print("Time        WC temp     WC Effect")
-print("---------------------------------")
+def calculate_wind_chill(temp_f, wind_speed):
+    """Вычисляет температуру ветрового охлаждения по формуле."""
+    # Формула из задания. Оператор ** означает возведение в степень.
+    wc = 35.74 + (0.6215 * temp_f) - (35.75 * (wind_speed  0.16)) + (0.4275 * temp_f * (wind_speed  0.16))
+    return wc
 
-wc1 = 35.74 + 0.6215 * 36 + (0.4275 * 36 - 35.75) * (27 ** 0.16)
-print(f"{'00:00:55':<12}{36:<12}{round(wc1, 1)}")
+def process_weather_data(input_filename, output_filename):
+    try:
+        with open(input_filename, 'r') as infile:
+            lines = infile.readlines()
+    except FileNotFoundError:
+        print(f"Ошибка: Файл {input_filename} не найден.")
+        return
 
-wc2 = 35.74 + 0.6215 * 33 + (0.4275 * 33 - 35.75) * (36 ** 0.16)
-print(f"{'00:30:22':<12}{33:<12}{round(wc2, 1)}")
+    # Списки для хранения результатов
+    report_lines = []
+    wc_effects = []
 
-wc3 = 35.74 + 0.6215 * 29 + (0.4275 * 29 - 35.75) * (40 ** 0.16)
-print(f"{'01:00:52':<12}{29:<12}{round(wc3, 1)}")
+    # Формируем заголовок отчета
+    report_lines.append("Time        WC temp    WC Effect")
+    report_lines.append("-" * 35)
 
-wc4 = 35.74 + 0.6215 * 29 + (0.4275 * 29 - 35.75) * (39 ** 0.16)
-print(f"{'01:30:14':<12}{29:<12}{round(wc4, 1)}")
+    # Обрабатываем строки, начиная с 3-й (индекс 2), так как первые две - шапка
+    for line in lines[2:]:
+        # Разбиваем строку по пробелам или табуляции
+        parts = line.split()
+        
+        # Проверка, что строка не пустая и содержит все 3 нужных элемента
+        if len(parts) >= 3:
+            time_str = parts[0]
+            try:
+                temp = float(parts[1])
+                wind = float(parts[2])
+                
+                # Вычисляем WC Effect
+                wc_effect = calculate_wind_chill(temp, wind)
+                wc_effects.append(wc_effect)
+                
+                # Форматируем строку для вывода (выравнивание как в примере)
+                # :<12 - выравнивание по левому краю шириной 12 символов
+                # :>5.1f - выравнивание по правому краю, 1 знак после запятой
+                formatted_line = f"{time_str:<12}{temp:>5.1f}     {wc_effect:>6.1f}"
+                report_lines.append(formatted_line)
+                
+            except ValueError:
+                # Пропускаем строки, где данные не являются числами (например, разделители)
+                continue
 
-wc5 = 35.74 + 0.6215 * 29 + (0.4275 * 29 - 35.75) * (41 ** 0.16)
-print(f"{'02:00:44':<12}{29:<12}{round(wc5, 1)}")
+    # Вычисляем среднее значение
+    if wc_effects:
+        average_wc = sum(wc_effects) / len(wc_effects)
+        report_lines.append("-" * 35)
+        # Форматируем строку со средним значением
+        avg_text = f"The average adjusted temperature, based on {len(wc_effects)} observations, was {average_wc:.1f}"
+        report_lines.append(avg_text)
+    else:
+        report_lines.append("Нет данных для обработки.")
 
-wc6 = 35.74 + 0.6215 * 27 + (0.4275 * 27 - 35.75) * (41 ** 0.16)
-print(f"{'02:30:01':<12}{27:<12}{round(wc6, 1)}")
+    # Записываем результат в выходной файл
+    with open(output_filename, 'w') as outfile:
+        for line in report_lines:
+            outfile.write(line + '\n')
+            
+    print(f"Обработка завершена. Результаты сохранены в {output_filename}")
 
-wc7 = 35.74 + 0.6215 * 23 + (0.4275 * 23 - 35.75) * (41 ** 0.16)
-print(f"{'03:00:35':<12}{23:<12}{round(wc7, 1)}")
+# --- Основная часть программы ---
+# Измените цифру 1 на номер вашего варианта, если нужно
+input_file = "1.WCData.txt"   
+output_file = "1.WindChillReport.txt"
 
-wc8 = 35.74 + 0.6215 * 27 + (0.4275 * 27 - 35.75) * (41 ** 0.16)
-print(f"{'03:30:52':<12}{27:<12}{round(wc8, 1)}")
-
-wc9 = 35.74 + 0.6215 * 23 + (0.4275 * 23 - 35.75) * (41 ** 0.16)
-print(f"{'04:00:01':<12}{23:<12}{round(wc9, 1)}")
-
-wc10 = 35.74 + 0.6215 * 23 + (0.4275 * 23 - 35.75) * (41 ** 0.16)
-print(f"{'04:30:45':<12}{23:<12}{round(wc10, 1)}")
-
-wc11 = 35.74 + 0.6215 * 27 + (0.4275 * 27 - 35.75) * (40 ** 0.16)
-print(f"{'05:00:48':<12}{27:<12}{round(wc11, 1)}")
-
-wc12 = 35.74 + 0.6215 * 23 + (0.4275 * 23 - 35.75) * (41 ** 0.16)
-print(f"{'05:30:29':<12}{23:<12}{round(wc12, 1)}")
-
-wc13 = 35.74 + 0.6215 * 19 + (0.4275 * 19 - 35.75) * (38 ** 0.16)
-print(f"{'06:00:33':<12}{19:<12}{round(wc13, 1)}")
-
-print("---------------------------------")
-
-total = wc1 + wc2 + wc3 + wc4 + wc5 + wc6 + wc7 + wc8 + wc9 + wc10 + wc11 + wc12 + wc13
-average = total / 13
-print(f"The average adjusted temperature, based on 13 observations, was {average:.1f}")
+process_weather_data(input_file, output_file)
